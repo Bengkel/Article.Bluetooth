@@ -1,0 +1,298 @@
+﻿@page "/"
+
+@inject IBluetoothNavigator navigator
+
+<MudText Typo="Typo.h4" Class="mb-8">Bluetooth Test</MudText>
+
+<MudPaper Class="pa-4">
+    <MudGrid>
+        <MudItem xs="12">
+            <MudTextField @bind-Value="@_serviceId" Label="ServiceId"></MudTextField>
+        </MudItem>
+        <MudItem xs="12">
+            <MudTextField @bind-Value="@_characteristicsId" Label="ServiceId"></MudTextField>
+        </MudItem>
+        <MudItem md="2" xs="12">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(_currentDevice != null)" @onclick="Pair" FullWidth>@_pairLabel</MudButton>
+        </MudItem>
+        <MudItem md="10" xs="12">
+            @if (_isPairing)
+            {
+                <MudProgressLinear Rounded="true" Size="Size.Small" Color="Color.Primary" Indeterminate="true" Class="ma-0 pa-0" />
+            } 
+
+            @if (_manufactorer!=null)
+            {
+                <MudElement HtmlTag="i">
+                    @_manufactorer, @_model (@_hardwareVersion), @_firmwareVersion
+                </MudElement>
+            }
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+<MudGrid>
+    <MudItem xs="12" Class="mb-8 mt-8" Style="min-height:38px">
+        @if (Exceptions != null)
+        {
+            <MudAlert Severity="Severity.Error" Dense="true">@Exceptions</MudAlert>
+        }
+        @if (Status != null)
+        {
+            <MudAlert Severity="Severity.Success" Dense="true">@Status</MudAlert>
+        }
+    </MudItem>
+</MudGrid>
+<MudPaper Class="pa-4">
+    <MudGrid>
+        <MudItem md="10" xs="12">
+            <MudTextField @bind-Value="@Message" Label="Send" MaxLength="10"></MudTextField>
+        </MudItem>
+        <MudItem md="2" xs="12">
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" Disabled="@(_currentDevice==null)" @onclick="Write" FullWidth>Write message</MudButton>
+        </MudItem>
+        <MudItem md="10" xs="12">
+            <MudTextField @bind-Value="@Response" Label="Read" ReadOnly="true"></MudTextField>
+        </MudItem>
+        <MudItem md="2" xs="12">
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" Disabled="@(_currentDevice==null)" @onclick="Read" FullWidth>Read message</MudButton>
+        </MudItem>
+        <MudItem xs="12">
+            <MudTextField @bind-Value="@Notifications"  Label="Notifications" Lines="5" ReadOnly="true"></MudTextField>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
+
+@code {
+    /// <summary>
+    /// The current bluetooth device paired.
+    /// </summary>
+    private Device? _currentDevice;
+
+    // edge://bluetooth-internals, find Bluno.
+    // MAC F8:30:02:09:1C:CE
+    // https://www.bluetooth.com/, Bluetooth SIG
+
+    /// <summary>
+    /// The service we want to connect to,
+    /// Bluno Guid will always be the same: 0000dfb0-0000-1000-8000-00805f9b34fb.
+    /// </summary>
+    private string _serviceId = "0000dfb0-0000-1000-8000-00805f9b34fb";
+
+    /// <summary>
+    /// The characterics we want to filter on.
+    /// Bluno Guid will always be the same: 0000dfb1-0000-1000-8000-00805f9b34fb.
+    /// </summary>
+    private string _characteristicsId = "0000dfb1-0000-1000-8000-00805f9b34fb";
+
+    /// <summary>
+    /// The device manufactorer.
+    /// </summary>
+    private string? _manufactorer;
+
+    /// <summary>
+    /// The device model.
+    /// </summary>
+    private string? _model;
+
+    /// <summary>
+    /// The device hardware version.
+    /// </summary>
+    private string? _hardwareVersion;
+
+    /// <summary>
+    /// The device firmware version.
+    /// </summary>
+    private string? _firmwareVersion;
+
+    /// <summary>
+    /// The default button label, which will be replaced by the <see cref="Device"> name after connection.
+    /// </summary>
+    private string _pairLabel = "Connect Device";
+
+    /// <summary>
+    /// Pairing status indicator.
+    /// </summary>
+    private bool _isPairing = false;
+
+    /// <summary>
+    /// The test message to send to the device.
+    /// </summary>
+    public string Message { get; set; } = "Hello";
+
+    /// <summary>
+    /// The value Read from the device.
+    /// </summary>
+    public string? Response { get; set; }
+
+    /// <summary>
+    /// Notifications from the device.
+    /// </summary>
+    public string? Notifications { get; set; }
+
+    /// <summary>
+    /// Status messages from the device.
+    /// </summary>
+    public string? Status { get; set; }
+
+    /// <summary>
+    /// Exceptions from the device.
+    /// </summary>
+    public string? Exceptions { get; set; }
+
+    /// <summary>
+    /// Pair the bluetooth device
+    /// </summary>
+    /// <returns></returns>
+    public async Task Pair()
+    {
+        Exceptions = null;
+        Status = null;
+
+        _isPairing = true;
+
+        try
+        {
+            var deviceQuery = new RequestDeviceQuery();
+            deviceQuery.Filters.Add(new Filter() { Services = { _serviceId } });
+            deviceQuery.OptionalServices.Add("0000180a-0000-1000-8000-00805f9b34fb");
+
+            // Get the device with the desired service identifier.
+            _currentDevice = await navigator.RequestDeviceAsync(deviceQuery);
+
+            Status = "Device connected";
+
+            _pairLabel = _currentDevice.Name;
+
+            if (_currentDevice != null)
+            {
+                // Get device information
+                _manufactorer = await ReadSpecific("0000180a-0000-1000-8000-00805f9b34fb", "00002a29-0000-1000-8000-00805f9b34fb");
+                _model = await ReadSpecific("0000180a-0000-1000-8000-00805f9b34fb", "00002a24-0000-1000-8000-00805f9b34fb");
+                _hardwareVersion = await ReadSpecific("0000180a-0000-1000-8000-00805f9b34fb", "00002a27-0000-1000-8000-00805f9b34fb");
+                _firmwareVersion = await ReadSpecific("0000180a-0000-1000-8000-00805f9b34fb", "00002a26-0000-1000-8000-00805f9b34fb");
+
+                // Setup notification          
+                // TODO Currently not supported, by this device?
+                //await _currentDevice.SetupNotifyAsync(_serviceId, _characteristicsId);
+                //_currentDevice.Notification += Value_Notification;
+            }
+        }
+        catch (Exception exception)
+        {
+            Exceptions = exception.Message;
+            Debug.WriteLine(Exceptions);
+        }
+
+        _isPairing = false;
+    }
+
+    /// <summary>
+    /// Write message to device.
+    /// Device returns the value that has been written.
+    /// </summary>
+    /// <returns></returns>
+    public async Task Write()
+    {
+        if (_currentDevice == null) return;
+
+        Exceptions = null;
+        Status = null;
+
+        try
+        {
+            byte[] bytes = Encoding.ASCII.GetBytes($"{Message}\n");
+
+            await _currentDevice.WriteValueAsync(_serviceId, _characteristicsId, bytes);
+
+            Status = "Message written";
+        }
+        catch (Exception exception)
+        {
+            Exceptions = exception.Message;
+            Debug.WriteLine(Exceptions);
+        }
+    }
+
+    /// <summary>
+    /// Read message from device.
+    /// Device returns the value that has been written.
+    /// </summary>
+    /// <returns></returns>
+    public async Task Read()
+    {
+        Response = await ReadSpecific(_serviceId, _characteristicsId);
+    }
+
+    /// <summary>
+    /// Read a specific characteristic supported by the Service.
+    /// </summary>
+    /// <param name="_characteristicsId"></param>
+    /// <returns></returns>
+    private async Task<string?> ReadSpecific(string serviceId, string characteristicsId)
+    {
+        string response = string.Empty;
+
+        if (_currentDevice == null)
+        {
+            return response;
+        }
+
+        Exceptions = null;
+        Status = null;
+
+        try
+        {
+            byte[] responseBytes = await _currentDevice.ReadValueAsync(serviceId, characteristicsId);
+
+            response = System.Text.UTF8Encoding.UTF8.GetString(responseBytes);
+
+            // Find null character
+            int i = response.IndexOf('\0');
+
+            // Select
+            if (i >= 0)
+            {
+                response = response.Substring(0, i);
+            }
+
+            Status = "Message read";
+
+            StateHasChanged();
+        }
+        catch (Exception exception)
+        {
+            Exceptions = exception.Message;
+            Debug.WriteLine(Exceptions);
+        }
+
+        return response;
+    }
+
+    /// <summary>
+    /// Device notification handler.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void Value_Notification(object sender, CharacteristicEventArgs e)
+    {
+        Exceptions = null;
+        Status = null;
+
+        try
+        {
+            var responseBytes = e.Value.ToArray();
+
+            Notifications = Encoding.ASCII.GetString(responseBytes);
+            Status = "Message received";
+
+
+            StateHasChanged();
+        }
+        catch (Exception exception)
+        {
+            Exceptions = exception.Message;
+            Debug.WriteLine(Exceptions);
+        }
+    }
+}

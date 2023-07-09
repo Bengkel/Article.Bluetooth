@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{D76C70
 		Sample\bluno\bluno.ino = Sample\bluno\bluno.ino
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bengkel.Ble", "Quaker.Ble\Bengkel.Ble.csproj", "{2DDBA290-766C-47A7-BA15-05F16ECA254C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bengkel.Ble", "Bengkel.Ble\Bengkel.Ble.csproj", "{2DDBA290-766C-47A7-BA15-05F16ECA254C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

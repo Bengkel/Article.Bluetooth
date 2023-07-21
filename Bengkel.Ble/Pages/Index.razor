@@ -10,7 +10,7 @@
             <MudTextField @bind-Value="@_serviceId" Label="ServiceId"></MudTextField>
         </MudItem>
         <MudItem xs="12">
-            <MudTextField @bind-Value="@_characteristicsId" Label="ServiceId"></MudTextField>
+            <MudTextField @bind-Value="@_characteristicsId" Label="CharacteristicsId"></MudTextField>
         </MudItem>
         <MudItem md="2" xs="12">
             <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(_currentDevice != null)" @onclick="Pair" FullWidth>@_pairLabel</MudButton>
@@ -62,16 +62,16 @@
     </MudGrid>
 </MudPaper>
 
-
 @code {
     /// <summary>
     /// The current bluetooth device paired.
     /// </summary>
     private Device? _currentDevice;
 
-    // edge://bluetooth-internals, find Bluno.
-    // MAC F8:30:02:09:1C:CE
+    // edge://bluetooth-internals, find device.
     // https://www.bluetooth.com/, Bluetooth SIG
+    // https://caniuse.com/web-bluetooth. browser limitations
+    // https://apps.apple.com/us/app/bluefy-web-ble-browser/id1492822055, for IoS devices
 
     /// <summary>
     /// The service we want to connect to,
@@ -225,6 +225,16 @@
     }
 
     /// <summary>
+    /// Disconnect from device.
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public async Task Disconnect()
+    {
+        throw new NotImplementedException();    
+    }
+
+    /// <summary>
     /// Read a specific characteristic supported by the Service.
     /// </summary>
     /// <param name="_characteristicsId"></param>
@@ -285,7 +295,6 @@
 
             Notifications = Encoding.ASCII.GetString(responseBytes);
             Status = "Message received";
-
 
             StateHasChanged();
         }

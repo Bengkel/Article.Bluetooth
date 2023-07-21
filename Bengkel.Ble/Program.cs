@@ -1,9 +1,9 @@
 using Blazm.Bluetooth;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using MudBlazor;
 using MudBlazor.Services;
 using Bengkel.Ble;
+using BlazorApplicationInsights;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -14,5 +14,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddMudServices();
 
 builder.Services.AddBlazmBluetooth();
+
+builder.Services.AddBlazorApplicationInsights();
 
 await builder.Build().RunAsync();

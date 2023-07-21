@@ -5,6 +5,8 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
+		<ApplicationInsightsResourceId>/subscriptions/de0bf8ab-db4d-43e4-8f5b-23708c66c4e1/resourceGroups/azure-today-bluetooth-blazor-rg/providers/microsoft.insights/components/azure-today-bluetooth-blazor-appi</ApplicationInsightsResourceId>
+		<UserSecretsId>5ab782ef-46f5-4e8d-a6a0-c1a2524f8972</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -13,6 +15,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Blazm.Bluetooth" Version="1.0.1" />
+		<PackageReference Include="BlazorApplicationInsights" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.2" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.2" PrivateAssets="all" />
 		<PackageReference Include="MudBlazor" Version="6.0.6" />

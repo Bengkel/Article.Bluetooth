@@ -57,7 +57,13 @@
             <MudButton Variant="Variant.Filled" Color="Color.Secondary" Disabled="@(_currentDevice==null)" @onclick="Read" FullWidth>Read message</MudButton>
         </MudItem>
         <MudItem xs="12">
-            <MudTextField @bind-Value="@Notifications"  Label="Notifications" Lines="5" ReadOnly="true"></MudTextField>
+
+            <MudCheckBox T="bool" CheckedChanged="ToggleNotify" Checked="_notify" Disabled="@(_currentDevice==null)">Enable device notifications.</MudCheckBox>
+            
+            @if (_notify)
+            {
+                <MudTextField @bind-Value="@Notifications"  Label="Notifications" Lines="5" ReadOnly="true"></MudTextField>
+            }
         </MudItem>
     </MudGrid>
 </MudPaper>
@@ -116,6 +122,11 @@
     private bool _isPairing = false;
 
     /// <summary>
+    /// Indicates if notify handler is On or Off.
+    /// </summary>
+    private bool _notify = false;
+
+    /// <summary>
     /// The test message to send to the device.
     /// </summary>
     public string Message { get; set; } = "Hello";
@@ -171,11 +182,6 @@
                 _model = await ReadSpecific("0000180a-0000-1000-8000-00805f9b34fb", "00002a24-0000-1000-8000-00805f9b34fb");
                 _hardwareVersion = await ReadSpecific("0000180a-0000-1000-8000-00805f9b34fb", "00002a27-0000-1000-8000-00805f9b34fb");
                 _firmwareVersion = await ReadSpecific("0000180a-0000-1000-8000-00805f9b34fb", "00002a26-0000-1000-8000-00805f9b34fb");
-
-                // Setup notification          
-                // TODO Currently not supported, by this device?
-                //await _currentDevice.SetupNotifyAsync(_serviceId, _characteristicsId);
-                //_currentDevice.Notification += Value_Notification;
             }
         }
         catch (Exception exception)
@@ -222,6 +228,35 @@
     public async Task Read()
     {
         Response = await ReadSpecific(_serviceId, _characteristicsId);
+    }
+
+    /// <summary>
+    /// Toggle device notifications On or Off.
+    /// </summary>
+    /// <returns></returns>
+    public async Task ToggleNotify()
+    {
+        _notify = !_notify;
+
+        if (_notify)
+        {
+            try
+            {
+
+                await _currentDevice.SetupNotifyAsync(_serviceId, _characteristicsId);
+                _currentDevice.Notification += Value_Notification;
+            }
+            catch (Exception exception)
+            {
+                Exceptions = $"Notify: {exception.Message}";
+                Debug.WriteLine(Exceptions);
+            }
+        }
+        else
+        {
+            Exceptions = null;
+            _currentDevice.Notification -= Value_Notification;
+        }
     }
 
     /// <summary>

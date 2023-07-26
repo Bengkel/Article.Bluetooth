@@ -2,7 +2,7 @@ using Blazm.Bluetooth;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
-using Bengkel.Ble;
+using Blazor.Bluetooth;
 using BlazorApplicationInsights;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);

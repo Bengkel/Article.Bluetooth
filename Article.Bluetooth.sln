@@ -8,7 +8,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{D76C70
 		Sample\sample.zip = Sample\sample.zip
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bengkel.Ble", "Bengkel.Ble\Bengkel.Ble.csproj", "{2DDBA290-766C-47A7-BA15-05F16ECA254C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{9B3C51FC-2880-4F08-9A03-2102E3697E35}"
+	ProjectSection(SolutionItems) = preProject
+		Resources\automation.ps1 = Resources\automation.ps1
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.Bluetooth", "Blazor.Bluetooth\Blazor.Bluetooth.csproj", "{43767BD2-3077-4605-892C-48C94CF59864}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,10 +21,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2DDBA290-766C-47A7-BA15-05F16ECA254C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2DDBA290-766C-47A7-BA15-05F16ECA254C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2DDBA290-766C-47A7-BA15-05F16ECA254C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2DDBA290-766C-47A7-BA15-05F16ECA254C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43767BD2-3077-4605-892C-48C94CF59864}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43767BD2-3077-4605-892C-48C94CF59864}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43767BD2-3077-4605-892C-48C94CF59864}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43767BD2-3077-4605-892C-48C94CF59864}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
